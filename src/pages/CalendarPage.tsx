@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useTask, Task } from '../context/TaskContext';
-import { Card } from '../components/ui/Card';
+
 
 export const CalendarPage = () => {
     const { items } = useTask();
@@ -26,8 +26,9 @@ export const CalendarPage = () => {
         const map: Record<string, Task[]> = {};
         items.forEach(task => {
             if (task.dueDate) {
-                // Asegurar formato fecha local
-                const dateKey = task.dueDate;
+                // Asegurar formato fecha YYYY-MM-DD para el calendario
+                // Si viene con hora (T), cortamos. Si no, tomamos tal cual.
+                const dateKey = task.dueDate.split('T')[0];
                 if (!map[dateKey]) map[dateKey] = [];
                 map[dateKey].push(task);
             }
@@ -102,60 +103,92 @@ export const CalendarPage = () => {
     const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
     return (
-        <div className="animate-fade-in space-y-6">
-            <Card>
-                <div className="p-4 flex items-center justify-between border-b border-slate-100">
-                    <h2 className="text-xl font-bold text-slate-700">📅 Calendario de Tareas</h2>
-                    <div className="flex items-center gap-4">
-                        <button onClick={handlePrevMonth} className="btn btn-secondary px-3 py-1">←</button>
-                        <span className="font-semibold text-lg w-32 text-center">{monthNames[month]} {year}</span>
-                        <button onClick={handleNextMonth} className="btn btn-secondary px-3 py-1">→</button>
-                    </div>
+        <div className="animate-fade-in space-y-8 max-w-6xl mx-auto">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Calendario</h2>
+                    <p className="text-slate-500 font-medium mt-1">Organiza tus tiempos.</p>
+                </div>
+                <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100 hidden sm:block">
+                    <span className="text-2xl">📅</span>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+                <div className="p-6 flex items-center justify-between border-b border-slate-100">
+                    <button onClick={handlePrevMonth} className="p-2 hover:bg-slate-100 rounded-full text-slate-500 hover:text-indigo-600 transition-colors">
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <h2 className="text-2xl font-bold text-indigo-900 capitalize">
+                        {monthNames[month]} <span className="text-indigo-400 font-light">{year}</span>
+                    </h2>
+                    <button onClick={handleNextMonth} className="p-2 hover:bg-slate-100 rounded-full text-slate-500 hover:text-indigo-600 transition-colors">
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    </button>
                 </div>
 
                 {/* Cabecera Dias Semana */}
-                <div className="grid grid-cols-7 bg-slate-50 border-b border-slate-200">
+                <div className="grid grid-cols-7 bg-slate-50/80 border-b border-slate-200/60">
                     {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(d => (
-                        <div key={d} className="py-2 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <div key={d} className="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">
                             {d}
                         </div>
                     ))}
                 </div>
 
                 {/* Grid Calendario */}
-                <div className="grid grid-cols-7">
+                <div className="grid grid-cols-7 bg-slate-100 gap-[1px]">
                     {renderCalendarDays()}
                 </div>
-            </Card>
+            </div>
 
             {/* Lista Tareas del Día Seleccionado */}
             {selectedDateStr && (
-                <Card className="border-indigo-200 bg-indigo-50/30">
+                <div className="bg-white rounded-2xl shadow-lg border-2 border-indigo-100/50 overflow-hidden animate-slide-in-up">
+                    <div className="p-4 bg-indigo-50 border-b border-indigo-100 flex items-center gap-3">
+                        <div className="bg-indigo-200 text-indigo-700 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg">
+                            {new Date(selectedDateStr as string).getDate()}
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-indigo-900">Tareas del Día</h3>
+                            <p className="text-xs text-indigo-600 font-medium opacity-75">{new Date(selectedDateStr as string).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+
+                        </div>
+                    </div>
+
                     <div className="p-4">
-                        <h3 className="font-bold text-lg text-slate-700 mb-3">
-                            Tareas para el {selectedDateStr}
-                        </h3>
                         {selectedDateTasks.length === 0 ? (
-                            <p className="text-slate-500 italic">No hay tareas programadas para este día.</p>
+                            <div className="text-center py-8 opacity-50">
+                                <span className="text-4xl block mb-2">🏖️</span>
+                                <p className="text-slate-500 font-medium">¡Día libre! No hay tareas para hoy.</p>
+                            </div>
                         ) : (
-                            <ul className="space-y-2">
+                            <div className="space-y-3">
                                 {selectedDateTasks.map(t => (
-                                    <li key={t.id} className="flex items-center gap-2 bg-white p-2 rounded shadow-sm border border-slate-100">
-                                        <span className={t.completed ? "text-slate-400" : "text-green-500"}>
+                                    <div key={t.id} className="flex items-center gap-4 bg-white p-3 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all group">
+
+                                        <div className={`p-2 rounded-lg ${t.completed ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400'}`}>
                                             {t.completed ? '✓' : '○'}
-                                        </span>
-                                        <span className={t.completed ? "line-through text-slate-400" : ""}>
-                                            {t.title}
-                                        </span>
-                                        <span className="text-xs text-slate-400 ml-auto bg-slate-100 px-2 py-0.5 rounded">
+                                        </div>
+
+                                        <div className="flex-1">
+                                            <p className={`font-semibold ${t.completed ? 'text-slate-400 line-through' : 'text-slate-800'}`}>
+                                                {t.title}
+                                            </p>
+                                        </div>
+
+                                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider
+                                            ${t.priority === 'Alta' ? 'bg-red-50 text-red-600' :
+                                                t.priority === 'Media' ? 'bg-orange-50 text-orange-600' :
+                                                    'bg-emerald-50 text-emerald-600'}`}>
                                             {t.priority}
                                         </span>
-                                    </li>
+                                    </div>
                                 ))}
-                            </ul>
+                            </div>
                         )}
                     </div>
-                </Card>
+                </div>
             )}
         </div>
     );

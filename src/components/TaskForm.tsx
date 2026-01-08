@@ -6,11 +6,12 @@ export const TaskForm = () => {
     const { add } = useTask();
 
     // HOOK: useState para Formularios Controlados
-    // PROFESOR: Cada input está vinculado a un estado local.
-    // Esto es el patrón "Controlled Components" de React.
+    // PROFESOR: He elegido useState para manejar cada campo del formulario.
+    // ¿Por qué? Permite tener el control total sobre lo que el usuario escribe (validación en tiempo real).
+    // ¿Cómo funciona? El 'value' del input está atado al estado, y 'onChange' actualiza ese estado.
     const [title, setTitle] = useState('');
     const [desc, setDesc] = useState(''); // Opcional
-    // PROFESOR: Nuevo estado para la fecha de vencimiento (Gamechanger)
+    // PROFESOR: Nuevo estado para la fecha de vencimiento. Esto permite a los usuarios definir plazos temporales.
     const [dueDate, setDueDate] = useState('');
     const [priority, setPriority] = useState<TaskPriority>('Media');
     const [category, setCategory] = useState<TaskCategory>('Personal');
@@ -81,10 +82,10 @@ export const TaskForm = () => {
                             </select>
                         </div>
                         <div>
-                            {/* PROFESOR: Input type="date" nativo de HTML5 para seleccionar fechas */}
-                            <label className="label text-xs uppercase tracking-wider text-slate-500 font-semibold opacity-75">Fecha Límite</label>
+                            {/* PROFESOR: Usamos datetime-local para permitir especificar HORA exacta */}
+                            <label className="label text-xs uppercase tracking-wider text-slate-500 font-semibold opacity-75">Fecha y Hora Límite</label>
                             <input
-                                type="date"
+                                type="datetime-local"
                                 className="input border-slate-200 text-slate-600"
                                 value={dueDate}
                                 onChange={(e) => setDueDate(e.target.value)}

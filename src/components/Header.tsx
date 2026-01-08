@@ -14,7 +14,7 @@ export const Header = ({ currentPage, setPage }: HeaderProps) => {
             <div className="container mx-auto h-16 flex items-center justify-between px-4">
                 <div
                     className="flex items-center gap-3 cursor-pointer group"
-                    onClick={() => setPage('tareas')}
+                    onClick={() => setPage('principal')}
                 >
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-200 group-hover:shadow-indigo-300 transition-all group-hover:scale-105">
                         ✓
@@ -26,9 +26,9 @@ export const Header = ({ currentPage, setPage }: HeaderProps) => {
                 </div>
 
                 <nav className="flex items-center gap-1 bg-slate-100/50 p-1 rounded-lg">
+                    <NavBtn label="Principal" id="principal" active={currentPage === 'principal'} onClick={setPage} />
                     <NavBtn label="Tareas" id="tareas" active={currentPage === 'tareas'} onClick={setPage} />
                     <NavBtn label="Calendario" id="calendario" active={currentPage === 'calendario'} onClick={setPage} />
-                    <NavBtn label="Terminadas" id="completadas" active={currentPage === 'completadas'} onClick={setPage} />
                     <NavBtn label="Estadísticas" id="estadisticas" active={currentPage === 'estadisticas'} onClick={setPage} />
                     <NavBtn label="⚙️" id="config" active={currentPage === 'config'} onClick={setPage} icon />
                 </nav>
